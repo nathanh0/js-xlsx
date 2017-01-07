@@ -11535,6 +11535,8 @@ function sheet_to_json(sheet, opts){
 		}
 	}
 
+	var maxcols = hdr.length;
+
 	for (R = r.s.r + offset; R <= r.e.r; ++R) {
 		rr = encode_row(R);
 		isempty = true;
@@ -11545,8 +11547,9 @@ function sheet_to_json(sheet, opts){
 			else row.__rowNum__ = R;
 		}
 		for (C = r.s.c; C <= r.e.c; ++C) {
+			if ( C >= maxcols ) break;
 			val = sheet[cols[C] + rr];
-			if(val === undefined || val.t === undefined) continue;
+			if(val === undefined || val.t === undefined) {val = {t: "s", v: null, w: ""};}
 			v = val.v;
 			switch(val.t){
 				case 'e': continue;
@@ -11555,14 +11558,14 @@ function sheet_to_json(sheet, opts){
 				default: throw 'unrecognized type ' + val.t;
 			}
 			if(v !== undefined) {
-				row[hdr[C]] = raw ? v : format_cell(val,v);
+				row["C" + (C+1)] = raw ? v : format_cell(val,v);
 				isempty = false;
 			}
 		}
 		if(isempty === false || header === 1) out[outi++] = row;
 	}
 	out.length = outi;
-	return out;
+	return { OUTPUT_COUNT: R - 1, OUTPUT_HEADERS: hdr, OUTPUT_DATA: out };
 }
 
 function sheet_to_row_object_array(sheet, opts) { return sheet_to_json(sheet, opts != null ? opts : {}); }
