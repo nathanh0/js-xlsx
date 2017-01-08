@@ -11565,7 +11565,9 @@ function sheet_to_json(sheet, opts){
 		if(isempty === false || header === 1) out[outi++] = row;
 	}
 	out.length = outi;
-	return { OUTPUT_COUNT: R - 1, OUTPUT_HEADERS: hdr, OUTPUT_DATA: out };
+	return JSON.stringify({"OUTPUT_COUNT": (R - 1)}) + "\n--------------------BREAK--------------------\n" +
+    JSON.stringify({"OUTPUT_HEADERS": hdr}) + "\n--------------------BREAK--------------------\n" +
+    JSON.stringify({"OUTPUT_DATA": out}).replace(new RegExp('\}\,\{', 'g'), '},'+"\n"+'{') + "\n--------------------BREAK--------------------\n";
 }
 
 function sheet_to_row_object_array(sheet, opts) { return sheet_to_json(sheet, opts != null ? opts : {}); }
